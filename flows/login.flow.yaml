@@ -1,0 +1,11 @@
+  appId: com.mate_app
+---  
+- launchApp
+- tapOn: "INGRESA USUARIO"
+- inputText: "JOSY"
+- tapOn: "INGRESA PASSWORD"
+- inputText: "Test1234"            
+- tapOn: "INGRESAR"
+- tapOn: "ACEPTAR"
+- tapOn: "OK"
+- stopApp
