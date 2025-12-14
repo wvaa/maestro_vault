@@ -2,30 +2,7 @@ pipeline {
     
     // 1. AGENT (Directiva principal)
     agent {
-        kubernetes {
-            yaml '''
-apiVersion: v1
-kind: Pod
-spec:
-  containers:
-  - name: Maestro-Container
-    image: "eclipse-temurin:17-jdk"
-    imagePullPolicy: "Always"
-    resources:
-      limits:
-        memory: "2Gi"
-        cpu: "1000m"
-      requests:
-        memory: "2Gi"
-        cpu: "1000m"
-    tty: true
-    command:
-    - sleep
-    args:
-    - infinity
-'''
-            defaultContainer 'Maestro-Container'
-        }
+        label 'maestro-pod' 
     }
     
     // 2. ENVIRONMENT (Directiva principal)
