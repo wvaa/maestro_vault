@@ -28,16 +28,6 @@ spec:
             defaultContainer 'Maestro-Container'
         }
     }
-    
-    // Aquí usamos withVault para obtener los secretos antes de las etapas
-    // El 'configuration' apunta al ID de la configuración de Vault en Jenkins (usualmente 'vault' si no se cambió)
-    // El 'vaultSecrets' define cómo mapear los campos del secreto a variables de entorno
-    withVault(credentialsId: 'BROWSERSTACK_VAULT_CONFIG', vaultSecrets: [
-        [secretPath: 'secret/data/ci/browserstack', engineVersion: 2, secretValues: [
-            [key: 'username', envVar: 'BROWSERSTACK_USERNAME'],
-            [key: 'access_key', envVar: 'BROWSERSTACK_ACCESS_KEY']
-        ]]
-    ]) {
         
         environment {
             // Variables NO secretas
@@ -78,7 +68,7 @@ spec:
                     sh """
                     echo "=== Comprimiendo carpeta TEST_SUITE ==="
                     cd suite-repo
-                    zip -r TEST_SUITE.zip flows
+                    zip -r TEST_SUITE.zip flows tests
                     ls -lh TEST_SUITE.zip
                     """
                 }
@@ -87,6 +77,12 @@ spec:
             
             stage('Upload Test Suite to BrowserStack') {
                 steps {
+                     withVault(credentialsId: 'BROWSERSTACK_VAULT_CONFIG', vaultSecrets: [
+                            [secretPath: 'secret/data/ci/browserstack', engineVersion: 2, secretValues: [
+                            [key: 'username', envVar: 'BROWSERSTACK_USERNAME'],
+                            [key: 'access_key', envVar: 'BROWSERSTACK_ACCESS_KEY']
+                        ]]
+                ]) {
                     script {
                         echo "=== Subiendo Test Suite a BrowserStack ==="
                         // Aquí BROWSERSTACK_USERNAME y BROWSERSTACK_ACCESS_KEY son usados de forma segura
@@ -106,6 +102,7 @@ spec:
                         env.TEST_SUITE_ID = testSuiteId
                     }
                 }
+            }
             }
 
             stage('Download BrowserStackLocal binary') {
@@ -127,6 +124,14 @@ spec:
 
             stage('Start BrowserStack Local') {
                 steps {
+                    
+                     withVault(credentialsId: 'BROWSERSTACK_VAULT_CONFIG', vaultSecrets: [
+                    [secretPath: 'secret/data/ci/browserstack', engineVersion: 2, secretValues: [
+                     [key: 'username', envVar: 'BROWSERSTACK_USERNAME'],
+                     [key: 'access_key', envVar: 'BROWSERSTACK_ACCESS_KEY']
+                    ]]
+             ]) {
+
                     sh """
                     echo "=== Iniciando BrowserStack Local ==="
                     // Uso seguro de BROWSERSTACK_ACCESS_KEY
@@ -135,17 +140,19 @@ spec:
                     sleep 10
                     """
                 }
+                }
+
             }
 
             stage('Build Steps Linux') {
                 steps {
 
-                     withVault(credentialsId: 'BROWSERSTACK_VAULT_CONFIG', vaultSecrets: [
-                    [secretPath: 'secret/data/ci/browserstack', engineVersion: 2, secretValues: [
-                        [key: 'username', envVar: 'BROWSERSTACK_USERNAME'],
-                        [key: 'access_key', envVar: 'BROWSERSTACK_ACCESS_KEY']
-                    ]]
-                ]) {
+                    withVault(credentialsId: 'BROWSERSTACK_VAULT_CONFIG', vaultSecrets: [
+        [secretPath: 'secret/data/ci/browserstack', engineVersion: 2, secretValues: [
+            [key: 'username', envVar: 'BROWSERSTACK_USERNAME'],
+            [key: 'access_key', envVar: 'BROWSERSTACK_ACCESS_KEY']
+        ]]
+    ]) { 
                     script {
                         def appParam = params.APP_ID?.trim() ?: 'default'
                         def testTagParam = params.Test_tag?.trim() ?: 'regression-test'
@@ -226,10 +233,10 @@ spec:
                             error("❌ Build fallida en BrowserStack con estado: ${status}")
                         }
                     }
-                    }//cierre withVault
-
+                
                 }
             }
+        }
         }
 
         post {
@@ -246,5 +253,5 @@ spec:
                 echo 'El pipeline ha fallado. Revisar y corregir.'
             }
         }
-   
+        
 }
