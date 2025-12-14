@@ -78,7 +78,7 @@ spec:
                     sh """
                     echo "=== Comprimiendo carpeta TEST_SUITE ==="
                     cd suite-repo
-                    zip -r TEST_SUITE.zip flows tests
+                    zip -r TEST_SUITE.zip flows
                     ls -lh TEST_SUITE.zip
                     """
                 }
@@ -139,6 +139,13 @@ spec:
 
             stage('Build Steps Linux') {
                 steps {
+
+                     withVault(credentialsId: 'BROWSERSTACK_VAULT_CONFIG', vaultSecrets: [
+                    [secretPath: 'secret/data/ci/browserstack', engineVersion: 2, secretValues: [
+                        [key: 'username', envVar: 'BROWSERSTACK_USERNAME'],
+                        [key: 'access_key', envVar: 'BROWSERSTACK_ACCESS_KEY']
+                    ]]
+                ]) {
                     script {
                         def appParam = params.APP_ID?.trim() ?: 'default'
                         def testTagParam = params.Test_tag?.trim() ?: 'regression-test'
@@ -219,6 +226,8 @@ spec:
                             error("❌ Build fallida en BrowserStack con estado: ${status}")
                         }
                     }
+                    }//cierre withVault
+
                 }
             }
         }
@@ -237,5 +246,5 @@ spec:
                 echo 'El pipeline ha fallado. Revisar y corregir.'
             }
         }
-    } // Cierre de withVault
+   
 }
