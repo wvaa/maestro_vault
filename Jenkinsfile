@@ -28,6 +28,13 @@ spec:
             defaultContainer 'Maestro-Container'
         }
     }
+
+    withVault(vaultSecrets: [
+        [secretPath: 'secret/data/ci/browserstack', engineVersion: 2, secretValues: [
+            [key: 'username', envVar: 'BROWSERSTACK_USERNAME'],
+            [key: 'access_key', envVar: 'BROWSERSTACK_ACCESS_KEY']
+        ]]
+    ]) {
         
         environment {
             // Variables NO secretas
@@ -77,12 +84,7 @@ spec:
             
             stage('Upload Test Suite to BrowserStack') {
                 steps {
-                     withVault(configuration: 'BROWSERSTACK_VAULT_CONFIG', vaultSecrets: [
-                            [secretPath: 'secret/data/ci/browserstack', engineVersion: 2, secretValues: [
-                            [key: 'username', envVar: 'BROWSERSTACK_USERNAME'],
-                            [key: 'access_key', envVar: 'BROWSERSTACK_ACCESS_KEY']
-                        ]]
-                ]) {
+                
                     script {
                         echo "=== Subiendo Test Suite a BrowserStack ==="
                         // Aquí BROWSERSTACK_USERNAME y BROWSERSTACK_ACCESS_KEY son usados de forma segura
@@ -101,7 +103,7 @@ spec:
                         // Guardamos en variable global para usar en siguiente stage
                         env.TEST_SUITE_ID = testSuiteId
                     }
-                }
+                
             }
             }
 
@@ -125,13 +127,7 @@ spec:
             stage('Start BrowserStack Local') {
                 steps {
                     
-                     withVault(configuration: 'BROWSERSTACK_VAULT_CONFIG', vaultSecrets: [
-                    [secretPath: 'secret/data/ci/browserstack', engineVersion: 2, secretValues: [
-                     [key: 'username', envVar: 'BROWSERSTACK_USERNAME'],
-                     [key: 'access_key', envVar: 'BROWSERSTACK_ACCESS_KEY']
-                    ]]
-             ]) {
-
+               
                     sh """
                     echo "=== Iniciando BrowserStack Local ==="
                     // Uso seguro de BROWSERSTACK_ACCESS_KEY
@@ -139,7 +135,7 @@ spec:
                     echo "Esperando 10 segundos para estabilizar..."
                     sleep 10
                     """
-                }
+                
                 }
 
             }
@@ -147,12 +143,7 @@ spec:
             stage('Build Steps Linux') {
                 steps {
 
-                    withVault(configuration: 'BROWSERSTACK_VAULT_CONFIG', vaultSecrets: [
-        [secretPath: 'secret/data/ci/browserstack', engineVersion: 2, secretValues: [
-            [key: 'username', envVar: 'BROWSERSTACK_USERNAME'],
-            [key: 'access_key', envVar: 'BROWSERSTACK_ACCESS_KEY']
-        ]]
-    ]) { 
+       
                     script {
                         def appParam = params.APP_ID?.trim() ?: 'default'
                         def testTagParam = params.Test_tag?.trim() ?: 'regression-test'
@@ -234,7 +225,7 @@ spec:
                         }
                     }
                 
-                }
+                
             }
         }
         }
@@ -253,5 +244,5 @@ spec:
                 echo 'El pipeline ha fallado. Revisar y corregir.'
             }
         }
-        
+    }    // Cierre de withVault
 }
