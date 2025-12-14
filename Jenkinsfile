@@ -77,7 +77,7 @@ spec:
             
             stage('Upload Test Suite to BrowserStack') {
                 steps {
-                     withVault(credentialsId: 'BROWSERSTACK_VAULT_CONFIG', vaultSecrets: [
+                     withVault(configuration: 'BROWSERSTACK_VAULT_CONFIG', vaultSecrets: [
                             [secretPath: 'secret/data/ci/browserstack', engineVersion: 2, secretValues: [
                             [key: 'username', envVar: 'BROWSERSTACK_USERNAME'],
                             [key: 'access_key', envVar: 'BROWSERSTACK_ACCESS_KEY']
@@ -125,7 +125,7 @@ spec:
             stage('Start BrowserStack Local') {
                 steps {
                     
-                     withVault(credentialsId: 'BROWSERSTACK_VAULT_CONFIG', vaultSecrets: [
+                     withVault(configuration: 'BROWSERSTACK_VAULT_CONFIG', vaultSecrets: [
                     [secretPath: 'secret/data/ci/browserstack', engineVersion: 2, secretValues: [
                      [key: 'username', envVar: 'BROWSERSTACK_USERNAME'],
                      [key: 'access_key', envVar: 'BROWSERSTACK_ACCESS_KEY']
@@ -147,7 +147,7 @@ spec:
             stage('Build Steps Linux') {
                 steps {
 
-                    withVault(credentialsId: 'BROWSERSTACK_VAULT_CONFIG', vaultSecrets: [
+                    withVault(configuration: 'BROWSERSTACK_VAULT_CONFIG', vaultSecrets: [
         [secretPath: 'secret/data/ci/browserstack', engineVersion: 2, secretValues: [
             [key: 'username', envVar: 'BROWSERSTACK_USERNAME'],
             [key: 'access_key', envVar: 'BROWSERSTACK_ACCESS_KEY']
