@@ -1,0 +1,16 @@
+server:
+  # Deshabilitar la persistencia para una instalación sencilla de desarrollo. 
+  # NO usar esto en producción.
+  dev:
+    enabled: true
+    # Por defecto, habilita el modo 'kv' (key/value) en el path 'secret'
+    devRootToken: "my-dev-root-token" 
+  
+  # Deshabilitar Ingress si no lo necesitas para acceso externo
+  ingress:
+    enabled: false
+  
+  # Exponer el servicio para que Jenkins pueda acceder a él. 
+  # Usamos ClusterIP y luego el nombre DNS del servicio.
+  service:
+    type: ClusterIP

@@ -6,6 +6,5 @@
 - tapOn: "INGRESA PASSWORD"
 - inputText: "Test1234"            
 - tapOn: "INGRESAR"
-- tapOn: "ACEPTAR"
 - tapOn: "OK"
 - stopApp
